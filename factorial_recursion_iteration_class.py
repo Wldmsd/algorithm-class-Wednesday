@@ -1,68 +1,105 @@
 #############################################################################
 #  시스템 스택 호출과 재귀함수를 이용한 팩토리얼 계산 콘솔 인터렉티브 프로그램 
 #  작성자: 이지은
-#  작성일: 2025-09-23
-
-# 순환(recursion)과 반복(iteration)의 차이점 이해
-#  - 반복문 기반과 재귀 기반의 팩토리얼 계산 함수 구현
-#  - 유효성 검사 포함 (0 이상 정수 확인)
-#  - 문자열 입력 → 정수 변환 → 유효성 검사 → 팩토리얼 계산까지 포함된 콘솔 프로그램 형태
-#  - q 또는 quit 입력 시 종료
+#  작성일: 2025-09-28
 #############################################################################
 
-def factorial_iter(n):
-    #반복문 기반 n!!
+import time
+
+# 반복문 기반 팩토리얼
+def factorial_iter(n: int) -> int:
+    if n < 0:
+        raise ValueError("오튜")
     result = 1
-    for k in range(2, n+1):
+    for k in range(2, n + 1):
         result *= k
     return result
 
-def factorial_rec(n):
-    #재귀적으로 문제 해결 n!
+# 재귀 기반 팩토리얼
+def factorial_rec(n: int) -> int:
+    if n < 0:
+        raise ValueError("오류")
     
-    #1. base case (재귀호출 종료 조건) 
-    if n == 1:
+    if n in (0, 1):
         return 1
     
-    #2. 재귀 분할 호출
-    #elif 사용하지 않고 바로 return문 안에 공식 넣기
-    return n * factorial_rec(n-1)
+    return n * factorial_rec(n - 1)
 
+# 실행 시간 측정 함수
+def run_with_time(func, n: int):
+    start = time.time()
+    result = func(n)
+    elapsed = time.time() - start
+    return result, elapsed
+
+# 테스트 데이터
+TEST_DATA = [0, 1, 2, 3, 5, 10, 15, 20, 30, 50, 100]
+
+# 메인 인터랙티브 함수
 def main():
-    print("팩토리얼 계산기 (반복/재귀)")
-    print("정수(0 이상)를 입력하세요. (종료하려면 q 또는 quit 입력)")
-
     while True:
-        user_input = input("\n입력: ").strip()
+        print("\n*** 팩토리얼 계산기 ***")
+        print("1. 반복문으로 팩토리얼 계산")
+        print("2. 재귀로 팩토리얼 계산")
+        print("3. 두 방식 비교")
+        print("4. 테스트 데이터 일괄 실행")
+        print("q. 종료")
 
-        # 종료 조건
-        if user_input.lower() in ("q", "quit"):
+        choice = input("메뉴 선택: ").strip()
+
+        if choice in ["1", "2", "3"]:
+            n_str = input("n 값을 입력하세요: ").strip()
+            if not n_str.isdigit():
+                print("⚠️ 오류: 정수를 입력하세요.")
+                continue
+            n = int(n_str)
+
+            try:
+                if choice == "1":
+                    result, elapsed = run_with_time(factorial_iter, n)
+                    print(f"[반복] {n}! = {result}")
+                    print(f"실행 시간: {elapsed:.6f}초")
+
+                elif choice == "2":
+                    result, elapsed = run_with_time(factorial_rec, n)
+                    print(f"[재귀] {n}! = {result}")
+                    print(f"실행 시간: {elapsed:.6f}초")
+                    
+                elif choice == "3":
+                    iter_res, iter_time = run_with_time(factorial_iter, n)
+                    rec_res, rec_time = run_with_time(factorial_rec, n)
+                    print(f"\n▶ {n}! 결과 비교")
+                    print(f"결과 일치 여부: {iter_res == rec_res}\n")
+                    
+                    print(f"[반복문]")
+                    print(f"결과: {iter_res}")
+                    print(f"실행 시간: {iter_time:.6f}초\n")
+                    
+                    print(f"[재귀함수]")
+                    print(f"결과: {rec_res}")
+                    print(f"실행 시간: {rec_time:.6f}초")
+
+            except ValueError as e:
+                print(f"오류: {e}")
+            
+        elif choice == "4":
+            for n in TEST_DATA:
+                print(f"\n--- n = {n} ---")
+                try:
+                    iter_res, iter_time = run_with_time(factorial_iter, n)
+                    rec_res, rec_time = run_with_time(factorial_rec, n)
+                    print(f"{n}! 결과 일치 여부: {iter_res == rec_res}")
+                    print(f"[반복] 실행 시간: {iter_time:.6f}초")
+                    print(f"[재귀] 실행 시간: {rec_time:.6f}초")
+                    print(f"결과값: {iter_res}")
+                except RecursionError:
+                    print(f"{n}! 재귀 계산 중 RecursionError 발생")
+
+        elif choice == "q":
             print("프로그램을 종료합니다.")
             break
+        else:
+            print("잘못된 입력입니다. 다시 선택하세요.")
 
-        # 정수 변환 및 유효성 검사
-        if not user_input.isdigit():
-            print("정수(0 이상의 숫자)만 입력하세요.")
-            continue
-
-        n = int(user_input)
-        if n < 0:
-            print("음수는 허용되지 않습니다.")
-            continue
-
-        # 계산 실행
-        print(f"[반복] {n}! = {factorial_iter(n)}")
-        try:
-            print(f"[재귀] {n}! = {factorial_rec(n)}")
-        except RecursionError:
-            print("입력값이 너무 커서 재귀 계산은 불가능합니다.")
-
-#if __name__ == "__main__":
-#    n = int(input("\n정수를 입력하세요: ").strip())
-#    print(f"반복문 기반: {factorial_iter(n)}")
-#    try:
-#        print(f"재귀 기반: {factorial_rec(n)}")
-#    except RecursionError:
-#        print("입력값이 너무 커서 재귀 계산은 불가능합니다.")
-
-    # main() 과제
+if __name__ == "__main__":
+    main()
