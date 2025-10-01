@@ -9,7 +9,7 @@ import time
 # 반복문 기반 팩토리얼
 def factorial_iter(n: int) -> int:
     if n < 0:
-        raise ValueError("오튜")
+        raise ValueError("오류")
     result = 1
     for k in range(2, n + 1):
         result *= k
