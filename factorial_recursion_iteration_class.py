@@ -102,4 +102,5 @@ def main():
             print("잘못된 입력입니다. 다시 선택하세요.")
 
 if __name__ == "__main__":
+
     main()
